@@ -31,10 +31,19 @@ app.post("/articles/create", (req, res) => {
 });
 
 app.put("/articles/update/:id", (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
+  const { title } = req.body;
+  const { desc } = req.body;
+
   const data = fs.readFileSync("articles.json", "utf8");
   const list = JSON.parse(data);
 
+  const elementIndex = list.findIndex((element) => element.id === Number(id));
+
+  list[elementIndex].title = title;
+  list[elementIndex].desc = desc;
+
+  fs.writeFileSync("articles.json", JSON.stringify(list));
   res.json([{ status: "Success" }]);
 });
 
