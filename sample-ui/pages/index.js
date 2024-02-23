@@ -2,21 +2,19 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function Home() {
-  const [articles, setArticles] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
 
   useEffect(() => {
-    fetchArticles();
+    getTask();
   }, []);
 
-  const fetchArticles = async () => {
+  const getTask = async () => {
     try {
-      await axios
-        .get("http://localhost:3000/articles/read")
-        .then((response) => {
-          setArticles(response.data);
-        });
+      await axios.get("http://localhost:3000/tasks/read").then((response) => {
+        setTasks(response.data);
+      });
     } catch (error) {
       console.error("Error:", error);
       alert("An error occured while creating the new articles");
@@ -29,19 +27,19 @@ export default function Home() {
   //   });
   // }
 
-  const createPost = async () => {
+  const createTask = async () => {
     if (!title || !desc) {
       alert("Please enter task");
       return;
     }
     try {
-      await axios.post("http://localhost:3000/articles/create", {
+      await axios.post("http://localhost:3000/tasks/create", {
         title,
         desc,
       });
       setTitle("");
       setDesc("");
-      fetchArticles();
+      getTask();
     } catch (error) {
       console.error("Error:", error);
       alert("An error occured while creating the new articles");
@@ -56,17 +54,17 @@ export default function Home() {
     setDesc(event.target.value);
   };
 
-  const editPost = async (article) => {
-    const editingTitle = prompt("Edit?", article.title);
-    const editingDesc = prompt("Edit?", article.desc);
+  const editTask = async (task) => {
+    const editedTitle = prompt("Edit?", task.title);
+    const editedDesc = prompt("Edit?", task.desc);
 
-    if ((editingTitle, editingDesc)) {
+    if ((editedTitle, editedDesc)) {
       try {
-        await axios.put(`http://localhost:3000/articles/update/${article.id}`, {
-          title: editingTitle,
-          desc: editingDesc,
+        await axios.put(`http://localhost:3000/tasks/update/${task.id}`, {
+          title: editedTitle,
+          desc: editedDesc,
         });
-        fetchArticles();
+        getTask();
       } catch (error) {
         console.error("Error:", error);
         alert("An error occured while creating the new articles");
@@ -74,14 +72,14 @@ export default function Home() {
     }
   };
 
-  const deletePost = async (id) => {
+  const deleteTask = async (id) => {
     if (confirm("Delete?"))
       try {
-        await axios.delete(`http://localhost:3000/articles/delete/${id}`, {
+        await axios.delete(`http://localhost:3000/tasks/delete/${id}`, {
           title,
           desc,
         });
-        fetchArticles();
+        getTask();
       } catch (error) {
         console.error("Error:", error);
         alert("An error occured while creating the new articles");
@@ -108,27 +106,27 @@ export default function Home() {
           />
           <button
             className="mb-2 btn btn-outline btn-primary"
-            onClick={createPost}
+            onClick={createTask}
           >
             New task
           </button>
         </div>
 
-        {articles.map((article) => (
-          <div key={article.id} className="shadow card bg-violet-200 mb-5">
+        {tasks.map((task) => (
+          <div key={task.id} className="shadow card bg-violet-200 mb-5">
             <div className="card-body">
               <div className="flex items-center">
-                <div className="flex-1 text-blue-900">{article.title}</div>
-                <div className="flex-1 text-blue-800">{article.desc}</div>
+                <div className="flex-1 text-blue-900">{task.title}</div>
+                <div className="flex-1 text-blue-800">{task.desc}</div>
                 <button
                   className="btn btn-outline btn-success mr-2"
-                  onClick={() => editPost(article)}
+                  onClick={() => editTask(task)}
                 >
                   Edit
                 </button>
                 <button
                   className="btn btn-outline btn-error"
-                  onClick={() => deletePost(article.id)}
+                  onClick={() => deleteTask(task.id)}
                 >
                   Delete
                 </button>
