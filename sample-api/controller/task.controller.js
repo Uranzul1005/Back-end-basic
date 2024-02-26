@@ -1,12 +1,28 @@
 const fs = require("fs");
+const postgres = require("postgres");
+require("dotenv").config();
+
+let { PGHOST, PGDATABASE, PGUSER, PGPASSWORD, ENDPOINT_ID } = process.env;
+
+const sql = postgres({
+  host: PGHOST,
+  database: PGDATABASE,
+  username: PGUSER,
+  password: PGPASSWORD,
+  port: 5432,
+  ssl: "require",
+  connection: {
+    options: `project=${ENDPOINT_ID}`,
+  },
+});
 
 const getTask = async (req, res) => {
-  const data = fs.readFileSync("tasks.json", "utf8");
-  res.json(JSON.parse(data));
+  const result = await sql`select * from task`;
+  res.json(result);
 };
 
 const createTask = async (req, res) => {
-  const { title, desc } = req.body;
+  const { title, description } = req.body;
   const data = fs.readFileSync("tasks.json", "utf8");
   const list = JSON.parse(data);
 
@@ -15,7 +31,7 @@ const createTask = async (req, res) => {
   list.push({
     id: taskId,
     title: title,
-    desc: desc,
+    description: description,
   });
 
   fs.writeFileSync("tasks.json", JSON.stringify(list));
@@ -25,7 +41,7 @@ const createTask = async (req, res) => {
 const editTask = async (req, res) => {
   const { id } = req.params;
   const { title } = req.body;
-  const { desc } = req.body;
+  const { description } = req.body;
 
   const data = fs.readFileSync("tasks.json", "utf8");
   const list = JSON.parse(data);
@@ -33,7 +49,7 @@ const editTask = async (req, res) => {
   const elementIndex = list.findIndex((element) => element.id === Number(id));
 
   list[elementIndex].title = title;
-  list[elementIndex].desc = desc;
+  list[elementIndex].description = description;
 
   fs.writeFileSync("tasks.json", JSON.stringify(list));
   res.json([{ status: "Success" }]);

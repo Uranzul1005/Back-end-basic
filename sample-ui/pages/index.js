@@ -4,7 +4,7 @@ import axios from "axios";
 export default function Home() {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     getTask();
@@ -28,17 +28,17 @@ export default function Home() {
   // }
 
   const createTask = async () => {
-    if (!title || !desc) {
+    if (!title || !description) {
       alert("Please enter task");
       return;
     }
     try {
       await axios.post("http://localhost:3000/tasks/create", {
         title,
-        desc,
+        description,
       });
       setTitle("");
-      setDesc("");
+      setDescription("");
       getTask();
     } catch (error) {
       console.error("Error:", error);
@@ -51,18 +51,18 @@ export default function Home() {
   };
 
   const handleChangeDesc = (event) => {
-    setDesc(event.target.value);
+    setDescription(event.target.value);
   };
 
   const editTask = async (task) => {
     const editedTitle = prompt("Edit?", task.title);
-    const editedDesc = prompt("Edit?", task.desc);
+    const editedDesc = prompt("Edit?", task.description);
 
     if ((editedTitle, editedDesc)) {
       try {
         await axios.put(`http://localhost:3000/tasks/update/${task.id}`, {
           title: editedTitle,
-          desc: editedDesc,
+          description: editedDesc,
         });
         getTask();
       } catch (error) {
@@ -77,7 +77,7 @@ export default function Home() {
       try {
         await axios.delete(`http://localhost:3000/tasks/delete/${id}`, {
           title,
-          desc,
+          description,
         });
         getTask();
       } catch (error) {
@@ -101,7 +101,7 @@ export default function Home() {
             type="text"
             className="mr-2 input"
             placeholder="Description"
-            value={desc}
+            value={description}
             onChange={handleChangeDesc}
           />
           <button
@@ -117,7 +117,7 @@ export default function Home() {
             <div className="card-body">
               <div className="flex items-center">
                 <div className="flex-1 text-blue-900">{task.title}</div>
-                <div className="flex-1 text-blue-800">{task.desc}</div>
+                <div className="flex-1 text-blue-800">{task.description}</div>
                 <button
                   className="btn btn-outline btn-success mr-2"
                   onClick={() => editTask(task)}
