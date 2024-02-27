@@ -23,18 +23,9 @@ const getTask = async (req, res) => {
 
 const createTask = async (req, res) => {
   const { title, description } = req.body;
-  const data = fs.readFileSync("tasks.json", "utf8");
-  const list = JSON.parse(data);
 
-  const taskId = Date.now();
+  await sql`insert into task values(${Date.now()}, ${title}, ${description})`;
 
-  list.push({
-    id: taskId,
-    title: title,
-    description: description,
-  });
-
-  fs.writeFileSync("tasks.json", JSON.stringify(list));
   res.json([{ status: "Success" }]);
 };
 
@@ -43,27 +34,15 @@ const editTask = async (req, res) => {
   const { title } = req.body;
   const { description } = req.body;
 
-  const data = fs.readFileSync("tasks.json", "utf8");
-  const list = JSON.parse(data);
+  await sql`update task set title = ${title}, description = ${description} where id = ${id}`;
 
-  const elementIndex = list.findIndex((element) => element.id === Number(id));
-
-  list[elementIndex].title = title;
-  list[elementIndex].description = description;
-
-  fs.writeFileSync("tasks.json", JSON.stringify(list));
   res.json([{ status: "Success" }]);
 };
 
 const deleteTask = async (req, res) => {
   const { id } = req.params;
 
-  const data = fs.readFileSync("tasks.json", "utf8");
-  const list = JSON.parse(data);
-
-  const newList = list.filter((item) => item.id !== Number(id));
-
-  fs.writeFileSync("tasks.json", JSON.stringify(newList));
+  await sql`delete from task where id = ${id}`;
 
   res.json([{ status: "Success" }]);
 };
