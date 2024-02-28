@@ -15,7 +15,7 @@ const sql = postgres({
     options: `project=${ENDPOINT_ID}`,
   },
 });
-
+// test
 const getTask = async (req, res) => {
   const result = await sql`select * from task`;
   res.json(result);
